@@ -39,3 +39,12 @@ Generated Audio
 - Error color: red (#DC2626)
 - Background: light gray (#F9FAFB)
 - Text: dark gray (#111827)
+
+## REST API Notes (Day 6)
+
+- HTTP methods used in this project: GET (/api/voices), POST (/api/tts)
+- Request = URL + method + headers + body (body only for POST)
+- Response = status code + body
+- Status codes planned: 200, 400, 401, 404, 500 (see backend spec)
+- fetch() used for all API calls from React, with async/await and try/catch
+- Practiced with https://jsonplaceholder.typicode.com before connecting to our own backend (Day 7)
