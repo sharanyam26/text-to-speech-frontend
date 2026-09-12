@@ -48,3 +48,9 @@ Generated Audio
 - Status codes planned: 200, 400, 401, 404, 500 (see backend spec)
 - fetch() used for all API calls from React, with async/await and try/catch
 - Practiced with https://jsonplaceholder.typicode.com before connecting to our own backend (Day 7)
+
+## Frontend-Backend Connection Test (Day 7)
+
+- Verified React (port 5173) can successfully fetch data from Express backend (port 5000)
+- Required `cors` package on backend to allow cross-origin requests
+- Confirmed request/response cycle end-to-end before building real API endpoints (Day 8+)
