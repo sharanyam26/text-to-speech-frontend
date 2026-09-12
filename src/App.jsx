@@ -1,4 +1,9 @@
+import { useState } from "react"
+import TextInput from "./components/TextInput"
+
 function App() {
+  const [text, setText] = useState("")
+
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col items-center py-10">
       <h1 className="text-3xl font-bold text-gray-900 mb-8">
@@ -6,17 +11,8 @@ function App() {
       </h1>
 
       <div className="w-full max-w-xl bg-white rounded-lg shadow p-6 space-y-4">
-        {/* Text input placeholder - real logic comes Day 4 */}
-        <div>
-          <label className="block text-gray-700 mb-1">Enter your text:</label>
-          <textarea
-            className="w-full border border-gray-300 rounded p-2 h-32"
-            placeholder="Type or paste text here..."
-          />
-          <p className="text-sm text-gray-500 mt-1">Characters: 0 / 5000</p>
-        </div>
+        <TextInput text={text} setText={setText} />
 
-        {/* Language/voice placeholders - real logic comes Day 5 */}
         <div className="flex gap-4">
           <div className="flex-1">
             <label className="block text-gray-700 mb-1">Language:</label>
@@ -32,7 +28,6 @@ function App() {
           </div>
         </div>
 
-        {/* Generate button placeholder - real logic comes Day 6/7 */}
         <button className="w-full bg-blue-600 text-white font-medium py-2 rounded hover:bg-blue-700">
           Generate Speech
         </button>
