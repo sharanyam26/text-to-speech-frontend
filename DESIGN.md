@@ -49,7 +49,7 @@ Generated Audio
 - fetch() used for all API calls from React, with async/await and try/catch
 - Practiced with https://jsonplaceholder.typicode.com before connecting to our own backend (Day 7)
 
-## Frontend-Backend Connection Test (Day 7)
+## Frontend-Backend Connection Test (Day 
 
 - Verified React (port 5173) can successfully fetch data from Express backend (port 5000)
 - Required `cors` package on backend to allow cross-origin requests

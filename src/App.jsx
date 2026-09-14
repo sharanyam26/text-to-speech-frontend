@@ -2,7 +2,10 @@ import { useState, useEffect } from "react"
 import TextInput from "./components/TextInput"
 import LanguageSelector from "./components/LanguageSelector"
 import VoiceSelector from "./components/VoiceSelector"
+import ErrorMessage from "./components/ErrorMessage"
 import { loadVoices, getLanguages, getVoicesForLanguage } from "./services/voices"
+import { speakText } from "./services/speech"
+import { validateTtsRequest } from "./services/api"
 
 function App() {
   const [text, setText] = useState("")
@@ -10,8 +13,9 @@ function App() {
   const [languages, setLanguages] = useState([])
   const [selectedLanguage, setSelectedLanguage] = useState("")
   const [selectedVoice, setSelectedVoice] = useState("")
+  const [isLoading, setIsLoading] = useState(false)
+  const [errorMessage, setErrorMessage] = useState("")
 
-  // Load voices once, when the app first mounts
   useEffect(() => {
     loadVoices().then((voices) => {
       setAllVoices(voices)
@@ -21,7 +25,6 @@ function App() {
     })
   }, [])
 
-  // Whenever the selected language changes, update the voice list
   const voicesForLanguage = getVoicesForLanguage(allVoices, selectedLanguage)
 
   useEffect(() => {
@@ -29,6 +32,43 @@ function App() {
       setSelectedVoice(voicesForLanguage[0].name)
     }
   }, [selectedLanguage, allVoices])
+
+  async function handleGenerateSpeech() {
+    setErrorMessage("")
+
+    if (text.trim() === "") {
+      setErrorMessage("Please enter some text before generating speech.")
+      return
+    }
+
+    const voiceObject = voicesForLanguage.find((v) => v.name === selectedVoice)
+    if (!voiceObject) {
+      setErrorMessage("Please select a valid voice.")
+      return
+    }
+
+    setIsLoading(true)
+
+    try {
+      // Step 1: validate through backend
+      await validateTtsRequest(text, selectedLanguage, selectedVoice)
+
+      // Step 2: speak using the browser's Web Speech API
+      speakText(
+        text,
+        voiceObject,
+        () => setIsLoading(true),
+        () => setIsLoading(false),
+        () => {
+          setIsLoading(false)
+          setErrorMessage("Speech playback failed. Please try again.")
+        }
+      )
+    } catch (error) {
+      setIsLoading(false)
+      setErrorMessage(error.message || "Network error. Please check your connection.")
+    }
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col items-center py-10">
@@ -52,9 +92,15 @@ function App() {
           />
         </div>
 
-        <button className="w-full bg-blue-600 text-white font-medium py-2 rounded hover:bg-blue-700">
-          Generate Speech
+        <button
+          onClick={handleGenerateSpeech}
+          disabled={isLoading}
+          className="w-full bg-blue-600 text-white font-medium py-2 rounded hover:bg-blue-700 disabled:bg-blue-300"
+        >
+          {isLoading ? "Generating..." : "Generate Speech"}
         </button>
+
+        <ErrorMessage message={errorMessage} />
       </div>
     </div>
   )
