@@ -11,13 +11,17 @@ export function speakText(text, voiceObject, volume, onStart, onEnd, onError) {
   utterance.onstart = onStart
   utterance.onend = onEnd
   utterance.onerror = (event) => {
+    // "interrupted" and "canceled" happen when we deliberately stop speech
+    // (Stop button, or starting new speech while old speech was playing).
+    // These are expected, not real failures - treat them like a normal end.
+    if (event.error === "interrupted" || event.error === "canceled") {
+      onEnd()
+      return
+    }
     console.error("Speech synthesis error:", event.error)
     onError(event)
   }
 
-  // Chrome has a known bug where speak() called right after cancel()
-  // can silently fail. A tiny delay when something was already speaking
-  // avoids the race condition.
   const delay = wasSpeaking ? 100 : 0
   setTimeout(() => {
     window.speechSynthesis.speak(utterance)
