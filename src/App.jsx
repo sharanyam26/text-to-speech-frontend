@@ -15,7 +15,8 @@ function App() {
   const [selectedVoice, setSelectedVoice] = useState("")
   const [isLoading, setIsLoading] = useState(false)
   const [errorMessage, setErrorMessage] = useState("")
-
+  const [lastGenerated, setLastGenerated] = useState(null)
+  
   useEffect(() => {
     loadVoices().then((voices) => {
       setAllVoices(voices)
@@ -34,42 +35,42 @@ function App() {
   }, [selectedLanguage, allVoices])
 
   async function handleGenerateSpeech() {
-    setErrorMessage("")
+  setErrorMessage("")
+  setLastGenerated(null)
 
-    if (text.trim() === "") {
-      setErrorMessage("Please enter some text before generating speech.")
-      return
-    }
-
-    const voiceObject = voicesForLanguage.find((v) => v.name === selectedVoice)
-    if (!voiceObject) {
-      setErrorMessage("Please select a valid voice.")
-      return
-    }
-
-    setIsLoading(true)
-
-    try {
-      // Step 1: validate through backend
-      await validateTtsRequest(text, selectedLanguage, selectedVoice)
-
-      // Step 2: speak using the browser's Web Speech API
-      speakText(
-        text,
-        voiceObject,
-        () => setIsLoading(true),
-        () => setIsLoading(false),
-        () => {
-          setIsLoading(false)
-          setErrorMessage("Speech playback failed. Please try again.")
-        }
-      )
-    } catch (error) {
-      setIsLoading(false)
-      setErrorMessage(error.message || "Network error. Please check your connection.")
-    }
+  if (text.trim() === "") {
+    setErrorMessage("Please enter some text before generating speech.")
+    return
   }
 
+  const voiceObject = voicesForLanguage.find((v) => v.name === selectedVoice)
+  if (!voiceObject) {
+    setErrorMessage("Please select a valid voice.")
+    return
+  }
+
+  setIsLoading(true)
+
+  try {
+    const result = await validateTtsRequest(text, selectedLanguage, selectedVoice)
+
+    speakText(
+      text,
+      voiceObject,
+      () => setIsLoading(true),
+      () => setIsLoading(false),
+      () => {
+        setIsLoading(false)
+        setErrorMessage("Speech playback failed. Please try again.")
+      }
+    )
+
+    setLastGenerated(result.data)
+  } catch (error) {
+    setIsLoading(false)
+    setErrorMessage(error.message || "Network error. Please check your connection.")
+  }
+}
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col items-center py-10">
       <h1 className="text-3xl font-bold text-gray-900 mb-8">
@@ -99,7 +100,15 @@ function App() {
         >
           {isLoading ? "Generating..." : "Generate Speech"}
         </button>
-
+         {lastGenerated && (
+  <div className="border-t pt-4">
+    <h2 className="text-gray-700 font-medium mb-2">Generated Audio</h2>
+    <p className="text-sm text-gray-500">
+      Speech generated for {lastGenerated.characterCount} characters in {lastGenerated.language}.
+    </p>
+    {/* Real <audio> player controls come tomorrow (Day 12) */}
+  </div>
+)}
         <ErrorMessage message={errorMessage} />
       </div>
     </div>
