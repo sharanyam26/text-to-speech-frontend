@@ -6,6 +6,7 @@ import ErrorMessage from "./components/ErrorMessage"
 import { loadVoices, getLanguages, getVoicesForLanguage } from "./services/voices"
 import { speakText } from "./services/speech"
 import { validateTtsRequest } from "./services/api"
+import AudioPlayer from "./components/AudioPlayer"
 
 function App() {
   const [text, setText] = useState("")
@@ -16,7 +17,8 @@ function App() {
   const [isLoading, setIsLoading] = useState(false)
   const [errorMessage, setErrorMessage] = useState("")
   const [lastGenerated, setLastGenerated] = useState(null)
-  
+  const [volume, setVolume] = useState(1)
+  const [isSpeakingNow, setIsSpeakingNow] = useState(false)
   useEffect(() => {
     loadVoices().then((voices) => {
       setAllVoices(voices)
@@ -57,10 +59,15 @@ function App() {
     speakText(
       text,
       voiceObject,
-      () => setIsLoading(true),
-      () => setIsLoading(false),
+      volume,
       () => {
         setIsLoading(false)
+        setIsSpeakingNow(true)
+      },
+      () => setIsSpeakingNow(false),
+      () => {
+        setIsLoading(false)
+        setIsSpeakingNow(false)
         setErrorMessage("Speech playback failed. Please try again.")
       }
     )
@@ -101,13 +108,11 @@ function App() {
           {isLoading ? "Generating..." : "Generate Speech"}
         </button>
          {lastGenerated && (
-  <div className="border-t pt-4">
-    <h2 className="text-gray-700 font-medium mb-2">Generated Audio</h2>
-    <p className="text-sm text-gray-500">
-      Speech generated for {lastGenerated.characterCount} characters in {lastGenerated.language}.
-    </p>
-    {/* Real <audio> player controls come tomorrow (Day 12) */}
-  </div>
+  <AudioPlayer
+    isSpeakingNow={isSpeakingNow}
+    volume={volume}
+    setVolume={setVolume}
+  />
 )}
         <ErrorMessage message={errorMessage} />
       </div>
