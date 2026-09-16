@@ -49,8 +49,27 @@ Generated Audio
 - fetch() used for all API calls from React, with async/await and try/catch
 - Practiced with https://jsonplaceholder.typicode.com before connecting to our own backend (Day 7)
 
-## Frontend-Backend Connection Test (Day 
+## Frontend-Backend Connection Test (Day 7)
 
 - Verified React (port 5173) can successfully fetch data from Express backend (port 5000)
 - Required `cors` package on backend to allow cross-origin requests
 - Confirmed request/response cycle end-to-end before building real API endpoints (Day 8+)
+
+## Known Limitation: Audio Download (Day 13)
+
+This project uses the browser's Web Speech API (`speechSynthesis`) for
+text-to-speech, per the Level 1 no-API-key approach. This API speaks
+audio directly through system speakers and does not expose the generated
+audio as a file, stream, or any capturable object in any browser.
+
+As a result, true audio file download (MP3/WAV/OGG, as described in the
+original spec) is not technically achievable with this architecture.
+
+Implemented alternative: a "Download Transcript" button that saves the
+input text as a .txt file — a genuinely working feature that preserves
+a record of what was converted to speech.
+
+To support real audio file download, the backend would need to integrate
+a paid TTS provider (Google Cloud TTS, Azure Speech, Amazon Polly, or
+ElevenLabs) that returns actual audio bytes — this is the natural
+Level 2/3 upgrade path per the project spec.

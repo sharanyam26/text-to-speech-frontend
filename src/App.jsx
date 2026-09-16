@@ -7,6 +7,7 @@ import { loadVoices, getLanguages, getVoicesForLanguage } from "./services/voice
 import { speakText } from "./services/speech"
 import { validateTtsRequest } from "./services/api"
 import AudioPlayer from "./components/AudioPlayer"
+import DownloadButton from "./components/DownloadButton"
 
 function App() {
   const [text, setText] = useState("")
@@ -108,11 +109,14 @@ function App() {
           {isLoading ? "Generating..." : "Generate Speech"}
         </button>
          {lastGenerated && (
-  <AudioPlayer
-    isSpeakingNow={isSpeakingNow}
-    volume={volume}
-    setVolume={setVolume}
-  />
+  <div className="space-y-3">
+    <AudioPlayer
+      isSpeakingNow={isSpeakingNow}
+      volume={volume}
+      setVolume={setVolume}
+    />
+    <DownloadButton text={lastGenerated.text} />
+  </div>
 )}
         <ErrorMessage message={errorMessage} />
       </div>
